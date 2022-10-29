@@ -1,0 +1,308 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(run, Some(22ae5f75-6c8d-4d50-82fb-c093d7db69d8), Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / run[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 15 Scala sources to /home/maira/Five-stage-pipeline/target/scala-2.12/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:2:8: not found: object chisel3[0m
+[0m[[0m[31merror[0m] [0m[0mimport chisel3._[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:3:8: not found: object chisel3[0m
+[0m[[0m[31merror[0m] [0m[0mimport chisel3.util._[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:5:23: illegal inheritance from final class Module[0m
+[0m[[0m[31merror[0m] [0m[0mclass EXE_MEM extends Module{[0m
+[0m[[0m[31merror[0m] [0m[0m                      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:7:11: not found: value IO[0m
+[0m[[0m[31merror[0m] [0m[0m	val io = IO(new Bundle{[0m
+[0m[[0m[31merror[0m] [0m[0m	         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:7:18: not found: type Bundle[0m
+[0m[[0m[31merror[0m] [0m[0m	val io = IO(new Bundle{[0m
+[0m[[0m[31merror[0m] [0m[0m	                ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:10:21: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m		val memWrite_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:10:27: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val memWrite_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:10:34: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val memWrite_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:11:20: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m		val memRead_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:11:26: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val memRead_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:11:33: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val memRead_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:12:21: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m		val memToReg_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:12:27: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val memToReg_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:12:34: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val memToReg_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:13:27: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m        val regWrite_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:13:33: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m        val regWrite_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                                ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:13:40: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m        val regWrite_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                                       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:14:15: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m		val rd_in = Input(UInt(5.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:14:21: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val rd_in = Input(UInt(5.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:14:28: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val rd_in = Input(UInt(5.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:15:22: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m		val aluOutput_in = Input(SInt(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:15:28: not found: value SInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val aluOutput_in = Input(SInt(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:15:36: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val aluOutput_in = Input(SInt(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:16:19: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m		val rs2Sel_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:16:25: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val rs2Sel_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:16:32: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val rs2Sel_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:17:13: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m		val rs2 = Input(SInt(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:17:19: not found: value SInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val rs2 = Input(SInt(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:17:27: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val rs2 = Input(SInt(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:18:22: not found: value Output[0m
+[0m[[0m[31merror[0m] [0m[0m		val memWrite_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:18:29: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val memWrite_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:18:36: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val memWrite_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:19:21: not found: value Output[0m
+[0m[[0m[31merror[0m] [0m[0m		val memRead_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:19:28: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val memRead_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:19:35: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val memRead_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                                ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:20:22: not found: value Output[0m
+[0m[[0m[31merror[0m] [0m[0m		val memToReg_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:20:29: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val memToReg_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:20:36: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val memToReg_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:21:28: not found: value Output[0m
+[0m[[0m[31merror[0m] [0m[0m        val regWrite_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:21:35: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m        val regWrite_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:21:42: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m        val regWrite_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                                         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:22:16: not found: value Output[0m
+[0m[[0m[31merror[0m] [0m[0m		val rd_out = Output(UInt(5.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:22:23: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val rd_out = Output(UInt(5.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:22:30: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val rd_out = Output(UInt(5.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:23:23: not found: value Output[0m
+[0m[[0m[31merror[0m] [0m[0m		val aluOutput_out = Output(SInt(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:23:30: not found: value SInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val aluOutput_out = Output(SInt(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:23:38: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val aluOutput_out = Output(SInt(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:24:20: not found: value Output[0m
+[0m[[0m[31merror[0m] [0m[0m		val rs2Sel_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:24:27: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val rs2Sel_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:24:34: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val rs2Sel_out = Output(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:25:17: not found: value Output[0m
+[0m[[0m[31merror[0m] [0m[0m		val rs2_out = Output(SInt(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:25:24: not found: value SInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val rs2_out = Output(SInt(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                     ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:25:32: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val rs2_out = Output(SInt(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:30:21: not found: value RegInit[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_memWrite = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:30:31: value U is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_memWrite = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:30:35: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_memWrite = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:31:20: not found: value RegInit[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_memRead = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:31:30: value U is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_memRead = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:31:34: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_memRead = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                                ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:32:21: not found: value RegInit[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_memToReg = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:32:31: value U is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_memToReg = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:32:35: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_memToReg = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:33:21: not found: value RegInit[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_regWrite = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:33:31: value U is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_regWrite = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:33:35: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_regWrite = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:34:15: not found: value RegInit[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_rd = RegInit(0.U(5.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:34:25: value U is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_rd = RegInit(0.U(5.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:34:29: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_rd = RegInit(0.U(5.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:35:22: not found: value RegInit[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_aluOutput = RegInit(0.S(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:35:32: value S is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_aluOutput = RegInit(0.S(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:35:37: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_aluOutput = RegInit(0.S(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:36:19: not found: value RegInit[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_rs2Sel = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:36:29: value U is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_rs2Sel = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:36:33: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_rs2Sel = RegInit(0.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:37:16: not found: value RegInit[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_rs2 = RegInit(0.S(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:37:26: value S is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_rs2 = RegInit(0.S(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/EX_MEM.scala:37:31: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m	val reg_rs2 = RegInit(0.S(32.W))[0m
+[0m[[0m[31merror[0m] [0m[0m	                             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:2:8: not found: object chisel3[0m
+[0m[[0m[31merror[0m] [0m[0mimport chisel3._[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:3:8: not found: object chisel3[0m
+[0m[[0m[31merror[0m] [0m[0mimport chisel3.util._[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:4:8: not found: object chisel3[0m
+[0m[[0m[31merror[0m] [0m[0mimport chisel3.core[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:6:22: illegal inheritance from final class Module[0m
+[0m[[0m[31merror[0m] [0m[0mclass ID_EXE extends Module{[0m
+[0m[[0m[31merror[0m] [0m[0m                     ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:8:11: not found: value IO[0m
+[0m[[0m[31merror[0m] [0m[0m	val io = IO(new Bundle{[0m
+[0m[[0m[31merror[0m] [0m[0m	         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:8:18: not found: type Bundle[0m
+[0m[[0m[31merror[0m] [0m[0m	val io = IO(new Bundle{[0m
+[0m[[0m[31merror[0m] [0m[0m	                ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:11:21: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m		val memWrite_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:11:27: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val memWrite_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:11:34: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val memWrite_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:12:20: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m		val memRead_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:12:26: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val memRead_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:12:33: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val memRead_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:13:21: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m		val memToReg_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:13:27: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val memToReg_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:13:34: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val memToReg_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:14:24: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m		val operandAsel_in = Input(UInt(2.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                     ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:14:30: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val operandAsel_in = Input(UInt(2.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:14:37: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val operandAsel_in = Input(UInt(2.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:15:24: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m		val operandBsel_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                     ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:15:30: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m		val operandBsel_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:15:37: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m		val operandBsel_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m		                                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:16:24: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m        val br_en_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/maira/Five-stage-pipeline/src/main/scala/datapath/ID_EX.scala:16:30: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m        val br_en_in = Input(UInt(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                             ^[0m
+[0m[[0m[31merror[0m] [0m[0m100 errors found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 4 s, completed Oct 29, 2022, 1:12:44 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(shell, None, None)[0m
