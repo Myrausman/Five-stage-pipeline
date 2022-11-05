@@ -19,17 +19,42 @@ class Top extends Module {
 	val Pc = Module(new PC())
 	val Jalr = Module(new Jalr())
 	val DataMemory = Module(new  data_Mem())
-	// val Branch= Module(new BranchControl())
+	val Branch= Module(new BranchControl())
 	// pipeline
 	val IF_ID =Module(new IF_ID())
 	val ID_EXE =Module(new ID_EXE())
 	val EX_MEM =Module (new EXE_MEM())
 	val MEM_WR =Module (new MEM_WR())
+	val forwardUnit=Module(new ForwardUnit())
+	val hazardDetection = Module(new HazardDetection())
+	val branchLogic =Module(new BranchLogic())
+	val branchForward =Module(new BranchForward())
+	// wiring
+	// memory and pc
+	
+	Pc.io.input:=Pc.io.pc4
+	Memory.io.WriteAddr := Pc.io.pc(11,2)
+	val inst = Memory.io.ReadData
+	io.addr:=Memory.io.WriteAddr
+	
 
 	//  pipeline fetch Module inputs
 	IF_ID.io.pc_in :=Pc.io.pc
 	IF_ID.io.pc4_in :=Pc.io.pc4
-	IF_ID.io.ins_in := Memory.io.ReadData
+	IF_ID.io.ins_in := inst
+
+
+	Control.io.Op_code:= IF_ID.io.ins_out(6,0) // opcode 7 bits , 
+	// reg 
+	reg.io.RegWrite := MEM_WR.io.regWrite_out
+	reg.io.reg1:= IF_ID.io.ins_out(19,15)
+	reg.io.reg2:= IF_ID.io.ins_out(24,20)
+	reg.io.rd:=MEM_WR.io.rd_out
+
+	// instruction
+	ImmediateGeneration.io.instr:=IF_ID.io.ins_out
+	ImmediateGeneration.io.PC:= IF_ID.io.pc_out
+
 	//  Decode execute  pipeline  inputs
 	// control signals 
 	ID_EXE.io.memWrite_in := Control.io.MemWrite
@@ -52,6 +77,7 @@ class Top extends Module {
 	ID_EXE.io.operandA_in := reg.io.rs1
 	ID_EXE.io.operandB_in:= reg.io.rs2
 
+	// immediate generation
 	when(Control.io.ExtSel === "b00".U) {
     // I-Type instruction
     	ID_EXE.io.imm := ImmediateGeneration.io.i_imm,
@@ -64,7 +90,147 @@ class Top extends Module {
 	}.otherwise {
     	ID_EXE.io.imm := 0.S(32.W)
 	}
+		// Alucntrl
+	AluControl.io.AluOp:= ID_EXE.io.aluOp_out
+	AluControl.io.funct3:= ID_EXE.io.func3_out
+	AluControl.io.funct7:= ID_EXE.io.func7_out
 
+		// Alu
+	// mux opA
+	Alu.io.in1:= MuxCase(0.S,Array(
+		(forwardUnit.io.forward_a === 0.U) -> ID_EXE.io.operandA_out,
+		(forwardUnit.io.forward_a ===  1.U ) -> EX_MEM.io.aluOutput_out,
+		(forwardUnit.io.forward_a === 2.U )-> reg.io.WriteData,
+		(forwardUnit.io.forward_a=== 3.U ) -> ID_EXE.io.operandA_out
+	))
+
+
+
+	// mux opb
+	// Controlling Operand B for ALU
+	when(ID_EXE.io.operandBsel_out=== 1.U) {
+		Alu.io.in2 := ID_EXE.io.imm_out
+
+		when(forwardUnit.io.forward_b === 0.U) {
+		EX_MEM.io.rs2 := ID_EXE.io.operandB_out
+		} .elsewhen(forwardUnit.io.forward_b === 1.U) {
+		EX_MEM.io.rs2 := EX_MEM.io.aluOutput_out
+		} .elsewhen(forwardUnit.io.forward_b === 2.U) {
+		EX_MEM.io.rs2  := reg.io.WriteData
+		} .otherwise {
+		EX_MEM.io.rs2 := ID_EXE.io.operandB_out
+		}
+	} 
+
+	.otherwise {
+		when(forwardUnit.io.forward_b === "b00".U) {
+			Alu.io.in2:= ID_EXE.io.operandB_out
+			EX_MEM.io.rs2 := ID_EXE.io.operandB_out
+		} .elsewhen(forwardUnit.io.forward_b === "b01".U) {
+			Alu.io.in2:= EX_MEM.io.aluOutput_out
+			EX_MEM.io.rs2 := EX_MEM.io.aluOutput_out
+		} .elsewhen(forwardUnit.io.forward_b === "b10".U) {
+			Alu.io.in2:= reg.io.WriteData
+			EX_MEM.io.rs2 := reg.io.WriteData
+		} .otherwise {
+			Alu.io.in2:= ID_EXE.io.operandB_out
+			EX_MEM.io.rs2  := ID_EXE.io.operandB_out
+		}}
+
+	hazardDetection.io.IF_ID_INST := IF_ID.io.ins_out
+	hazardDetection.io.ID_EX_MEMREAD := ID_EXE.io.memRead_out
+	hazardDetection.io.ID_EX_REGRD := ID_EXE.io.rd_out
+	hazardDetection.io.pc_in := IF_ID.io.pc4_out
+	hazardDetection.io.current_pc := IF_ID.io.pc_out
+	when(hazardDetection.io.inst_forward === "b1".U) {
+		IF_ID.io.ins_in  := hazardDetection.io.inst_out
+		IF_ID.io.pc_in := hazardDetection.io.current_pc_out
+	} .otherwise {
+		IF_ID.io.ins_in := Memory.io.ReadData
+	}
+	when(hazardDetection.io.pc_forward === "b1".U) {
+		Pc.io.input := hazardDetection.io.pc_out
+	} .otherwise {
+		Pc.io.input := Pc.io.pc4
+	}
+	when(hazardDetection.io.ctrl_forward === "b1".U) {
+    ID_EXE.io.memWrite_in := 0.U
+	ID_EXE.io.memRead_in := 0.U
+    ID_EXE.io.br_en_in := 0.U
+    ID_EXE.io.regWrite_in := 0.U
+    ID_EXE.io.memToReg_in := 0.U
+    ID_EXE.io.aluOp_in := 0.U
+    ID_EXE.io.operandAsel_in := 0.U
+    ID_EXE.io.operandBsel_in := 0.U
+    ID_EXE.io.NextPc := 0.U
+
+	}.otherwise {
+    ID_EXE.io.memWrite_in := Control.io.MemWrite
+    ID_EXE.io.memRead_in := Control.io.MemRead
+    ID_EXE.io.br_en_in := Control.io.Branch
+    ID_EXE.io.regWrite_in := Control.io.RegWrite 
+    ID_EXE.io.memToReg_in := Control.io.MemtoReg
+    ID_EXE.io.aluOp_in := Control.io.AluOp
+    ID_EXE.io.operandAsel_in := Control.io.OpA
+    ID_EXE.io.operandBsel_in := Control.io.OpB 
+    ID_EXE.io.NextPc := Control.io.NextPc 
+
+	}
+		// Initializing Branch Forward Unit
+	branchForward.io.ID_EX_REGRD := ID_EXE.io.rd_out
+	branchForward.io.ID_EX_MEMRD := ID_EXE.io.memRead_out
+	branchForward.io.EX_MEM_REGRD := EX_MEM.io.rd_out
+	branchForward.io.MEM_WB_REGRD := MEM_WR.io.rd_out
+	branchForward.io.EX_MEM_MEMRD := EX_MEM.io.memRead_out
+	branchForward.io.MEM_WB_MEMRD := MEM_WR.io.MemRead_out
+	branchForward.io.rs1_sel := IF_ID.io.ins_out(19, 15)
+	branchForward.io.rs2_sel := IF_ID.io.ins_out(24, 20)
+	branchForward.io.ctrl_branch := Control.io.Branch
+	// FOR REGISTER RS1 in BRANCH LOGIC UNIT
+	when(branchForward.io.forward_rs1 === "b000".U) {
+	// No hazard just use register file data
+		branchLogic.io.in_rs1 := reg.io.rs1
+	}.elsewhen(branchForward.io.forward_rs1 === "b001".U) {
+	// hazard in alu stage forward data from alu output
+		branchLogic.io.in_rs1 := Alu.io.out
+	}.elsewhen(branchForward.io.forward_rs1 === "b010".U) {
+	// hazard in EX/MEM stage forward data from EX/MEM.alu_output
+		branchLogic.io.in_rs1 := EX_MEM.io.aluOutput_out
+	} .elsewhen(branchForward.io.forward_rs1 === "b011".U) {
+	// hazard in MEM/WB stage forward data from register file write data which will have correct data from the MEM/WB mux
+		branchLogic.io.in_rs1 := reg.io.WriteData
+	}.elsewhen(branchForward.io.forward_rs1 === "b100".U) {
+	// hazard in EX/MEM stage and load type instruction so forwarding from data memory data output instead of EX/MEM.alu_output
+		branchLogic.io.in_rs1 := DataMemory.io.instRead
+	}.elsewhen(branchForward.io.forward_rs1 === "b101".U) {
+	// hazard in MEM/WB stage and load type instruction so forwarding from register file write data which will have the correct output from the mux
+		branchLogic.io.in_rs1 := reg.io.WriteData
+	}.otherwise {
+		branchLogic.io.in_rs1 := reg.io.rs1
+	}
+	// / FOR REGISTER RS2 in BRANCH LOGIC UNIT
+	when(branchForward.io.forward_rs2 === "b000".U) {
+	// No hazard just use register file data
+	branchLogic.io.in_rs2 := reg.io.rs2
+	} .elsewhen(branchForward.io.forward_rs2 === "b001".U) {
+	// hazard in alu stage forward data from alu output
+	branchLogic.io.in_rs2 := Alu.io.out
+	} .elsewhen(branchForward.io.forward_rs2 === "b010".U) {
+	// hazard in EX/MEM stage forward data from EX/MEM.alu_output
+	branchLogic.io.in_rs2 := EX_MEM.io.aluOutput_out
+	} .elsewhen(branchForward.io.forward_rs2 === "b011".U) {
+	// hazard in MEM/WB stage forward data from register file write data which will have correct data from the MEM/WB mux
+	branchLogic.io.in_rs2 := reg.io.WriteData
+	} .elsewhen(branchForward.io.forward_rs2 === "b100".U) {
+	// hazard in EX/MEM stage and load type instruction so forwarding from data memory data output instead of EX/MEM.alu_output
+	branchLogic.io.in_rs2 := DataMemory.io.instRead
+	} .elsewhen(branchForward.io.forward_rs2 === "b101".U) {
+	// hazard in MEM/WB stage and load type instruction so forwarding from register file write data which will have the correct output from the mux
+	branchLogic.io.in_rs2 := reg.io.WriteData
+	}
+	.otherwise {
+		branchLogic.io.in_rs2 := reg.io.rs2
+  }
 	// EXecute Memory stage
 	EX_MEM.io.memWrite_in := ID_EXE.io.memWrite_out
 	EX_MEM.io.memRead_in := ID_EXE.io.memRead_out
@@ -72,9 +238,17 @@ class Top extends Module {
 	EX_MEM.io.regWrite_in := ID_EXE.io.regWrite_out
 	EX_MEM.io.rd_in := ID_EXE.io.rd_out
 	EX_MEM.io.aluOutput_in := Alu.io.out
-	EX_MEM.io.rs2Sel_in:=ID_EXE.io.operandBsel_out
+	// EX_MEM.io.rs2Sel_in:=ID_EXE.io.operandBsel_out
 	EX_MEM.io.rs2:=ID_EXE.io.operandB_out
 	// val strData_in = Input(SInt(32.W))
+	forwardUnit.io.EX_MEM_REGRD := EX_MEM.io.rd_out 
+	forwardUnit.io.MEM_WB_REGRD := MEM_WR.io.rd_out
+	forwardUnit.io.ID_EX_REGRS1 := ID_EXE.io.rs1Ins_out
+	forwardUnit.io.ID_EX_REGRS2 := ID_EXE.io.rs2Ins_out
+	forwardUnit.io.EX_MEM_REGWR := EX_MEM.io.regWrite_out 
+	forwardUnit.io.MEM_WB_REGWR := MEM_WR.io.regWrite_out
+
+
 	// MEmwriteback stage
 	MEM_WR.io.memToReg_in:= EX_MEM.io.memToReg_out
 	MEM_WR.io.regWrite_in:=EX_MEM.io.regWrite_out
@@ -85,59 +259,29 @@ class Top extends Module {
 	
 	MEM_WR.io.memWrite_in:=EX_MEM.io.memWrite_out
 
-	// wiring
-	// memory and pc
 	
-	Pc.io.input:=Pc.io.pc4
-	Memory.io.WriteAddr := Pc.io.pc(11,2)
-	io.addr:=Memory.io.WriteAddr
-	Control.io.Op_code:= IF_ID.io.ins_out(6,0) // opcode 7 bits , 
-	// reg 
-	reg.io.RegWrite := MEM_WR.io.regWrite_out
-	reg.io.reg1:= IF_ID.io.ins_out(19,15)
-	reg.io.reg2:= IF_ID.io.ins_out(24,20)
-	reg.io.rd:=MEM_WR.io.rd_out
-
-	// instruction
-	ImmediateGeneration.io.instr:=IF_ID.io.ins_out
-	ImmediateGeneration.io.PC:= IF_ID.io.pc_out
+	
 	// jalr
 	Jalr.io.rs1:= reg.io.rs1
 	Jalr.io.immd_se:=ImmediateGeneration.io.i_imm
-	// Alucntrl
-	AluControl.io.AluOp:= ID_EXE.io.aluOp_out
-	AluControl.io.funct3:= ID_EXE.io.func3_out
-	AluControl.io.funct7:= ID_EXE.io.func7_out
-	// // Branch
-	// Branch.io.alucnt:=AluControl.io.alucnt
-	// Branch.io.in1:=MuxCase(0.S,Array(
-	// 	(Control.io.OpA === 0.U) -> reg.io.rs1,
-	// 	(Control.io.OpA === 1.U ) -> (Pc.io.pc4).asSInt,
-	// 	(Control.io.OpA === 2.U )-> (Pc.io.pc).asSInt,
-	// 	(Control.io.OpA === 3.U ) -> reg.io.rs1
-	// ))
-	// Branch.io.in2:= MuxCase(0.S,Array(
-	// 	(Control.io.ExtSel === 0.U && Control.io.OpB ===1.U) -> ImmediateGeneration.io.i_imm,
-	// 	(Control.io.ExtSel === 1.U &&  Control.io.OpB === 1.U ) -> ImmediateGeneration.io.s_imm,
-	// 	(Control.io.ExtSel === 2.U && Control.io.OpB === 1.U )-> ImmediateGeneration.io.u_imm,
-	// 	(Control.io.OpB === 0.U ) -> reg.io.rs2))
-	// Branch.io.Branch:=Control.io.Branch
+
+	// Branch
+	Branch.io.alucnt:=AluControl.io.alucnt
+	Branch.io.in1:=MuxCase(0.S,Array(
+		(Control.io.OpA === 0.U) -> reg.io.rs1,
+		(Control.io.OpA === 1.U ) -> (Pc.io.pc4).asSInt,
+		(Control.io.OpA === 2.U )-> (Pc.io.pc).asSInt,
+		(Control.io.OpA === 3.U ) -> reg.io.rs1
+	))
+	Branch.io.in2:= MuxCase(0.S,Array(
+		(Control.io.ExtSel === 0.U && Control.io.OpB ===1.U) -> ImmediateGeneration.io.i_imm,
+		(Control.io.ExtSel === 1.U &&  Control.io.OpB === 1.U ) -> ImmediateGeneration.io.s_imm,
+		(Control.io.ExtSel === 2.U && Control.io.OpB === 1.U )-> ImmediateGeneration.io.u_imm,
+		(Control.io.OpB === 0.U ) -> reg.io.rs2))
+	Branch.io.Branch:=Control.io.Branch
 	
 
-	// Alu
-	// mux opA
-	Alu.io.in1:= MuxCase(0.S,Array(
-		(ID_EXE.io.operandAsel_in === 0.U) -> ID_EXE.io.operandA_out,
-		(ID_EXE.io.operandAsel_in  === 1.U ) -> (ID_EXE.io.pc4_out).asSInt,
-		(ID_EXE.io.operandAsel_in === 2.U )-> (ID_EXE.io.pc_out).asSInt,
-		(Control.io.OpA === 3.U ) -> ID_EXE.io.operandA_out
-	))
-	// mux opb
-	when(ID_EXE.io.operandBsel_out === "b1".U) {
-		Alu.io.in2:= ID_EXE.io.imm_out
-	} .otherwise {
-		Alu.io.in2:= ID_EXE.io.operandB_out
-	}
+
 	Alu.io.alucnt:=AluControl.io.alucnt
 	// datamemory
 	DataMemory.io.Addr:=(EX_MEM.io.aluOutput_out(9,2)).asUInt
@@ -158,4 +302,31 @@ class Top extends Module {
 		(Control.io.NextPc === 3.U) -> (Jalr.io.jalout).asUInt()
 	)) 
 	io.Reg_Out:=0.S
+	branchLogic.io.in_rs1 := reg.io.rs1
+	branchLogic.io.in_rs2 := reg.io.rs2
+	branchLogic.io.in_func3 := IF_ID.io.ins_out(14,12)
+
+	when(hazardDetection.io.pc_forward === "b1".U) {
+  		Pc.io.input := hazardDetection.io.pc_out
+	}.otherwise {
+    when(Control.io.NextPc === "b01".U) {
+      	when(branchLogic.io.output === 1.U && Control.io.Branch === 1.U) {
+        Pc.io.input := ImmediateGeneration.io.sb_imm.asUInt
+        IF_ID.io.pc_in := 0.U
+        IF_ID.io.pc4_in := 0.U
+        IF_ID.io.ins_in := 0.U
+    	}.otherwise {
+        Pc.io.input := Pc.io.pc4
+		}
+	}.elsewhen(Control.io.NextPc === "b10".U) {
+		Pc.io.input := ImmediateGeneration.io.uj_imm.asUInt
+		IF_ID.io.pc_in := 0.U
+		IF_ID.io.pc4_in := 0.U
+		IF_ID.io.ins_in := 0.U
+    }.otherwise {
+      Pc.io.input := Pc.io.pc4
+    }
+	}
+
+
 }
