@@ -85,51 +85,83 @@ class Top extends Module {
 	decodeForward.io.rs1_sel := IF_ID.io.ins_out(19, 15)
 	decodeForward.io.rs2_sel := IF_ID.io.ins_out(24, 20)
 	decodeForward.io.ctrl_branch := Control.io.Branch
+	
 	// FOR REGISTER RS1 in BRANCH LOGIC UNIT
-	when(decodeForward.io.forward_rs1 === "b000".U) {
+	when(decodeForward.io.forward_rs1 === "b0000".U) {
 	// No hazard just use register file data
-		branchLogic.io.in_rs1 := reg.io.rs1
-	}.elsewhen(decodeForward.io.forward_rs1 === "b001".U) {
+	branchLogic.io.in_rs1 := reg.io.rs1
+	Jalr.io.rs1 :=  reg.io.rs1
+	} .elsewhen(decodeForward.io.forward_rs1 === "b0001".U) {
 	// hazard in alu stage forward data from alu output
-		branchLogic.io.in_rs1 := Alu.io.out
-	}.elsewhen(decodeForward.io.forward_rs1 === "b010".U) {
+	branchLogic.io.in_rs1 := Alu.io.out
+	Jalr.io.rs1 := reg.io.rs1
+	} .elsewhen(decodeForward.io.forward_rs1 === "b0010".U) {
 	// hazard in EX/MEM stage forward data from EX/MEM.alu_output
-		branchLogic.io.in_rs1 := EX_MEM.io.aluOutput_out
-	} .elsewhen(decodeForward.io.forward_rs1 === "b011".U) {
+	branchLogic.io.in_rs1 := EX_MEM.io.aluOutput_out
+	Jalr.io.rs1 := reg.io.rs1
+	} .elsewhen(decodeForward.io.forward_rs1 === "b0011".U) {
 	// hazard in MEM/WB stage forward data from register file write data which will have correct data from the MEM/WB mux
-		branchLogic.io.in_rs1 := reg.io.WriteData
-	}.elsewhen(decodeForward.io.forward_rs1 === "b100".U) {
+	branchLogic.io.in_rs1 := reg.io.WriteData
+	Jalr.io.rs1 := reg.io.rs1
+	} .elsewhen(decodeForward.io.forward_rs1 === "b0100".U) {
 	// hazard in EX/MEM stage and load type instruction so forwarding from data memory data output instead of EX/MEM.alu_output
-		branchLogic.io.in_rs1 := DataMemory.io.instRead
-	}.elsewhen(decodeForward.io.forward_rs1 === "b101".U) {
+	branchLogic.io.in_rs1 := DataMemory.io.instRead
+	Jalr.io.rs1 := reg.io.rs1
+	} .elsewhen(decodeForward.io.forward_rs1 === "b0101".U) {
 	// hazard in MEM/WB stage and load type instruction so forwarding from register file write data which will have the correct output from the mux
-		branchLogic.io.in_rs1 := reg.io.WriteData
-	}.otherwise {
+	branchLogic.io.in_rs1 := reg.io.WriteData
+	Jalr.io.rs1 := reg.io.rs1
+	}
+		.elsewhen(decodeForward.io.forward_rs1 === "b0110".U) {
+		// hazard in alu stage forward data from alu output
+		Jalr.io.rs1 := Alu.io.out
+		branchLogic.io.in_rs1 := reg.io.rs1
+	} .elsewhen(decodeForward.io.forward_rs1 === "b0111".U) {
+		// hazard in EX/MEM stage forward data from EX/MEM.alu_output
+		Jalr.io.rs1 := EX_MEM.io.aluOutput_out
+		branchLogic.io.in_rs1 := reg.io.rs1
+	} .elsewhen(decodeForward.io.forward_rs1 === "b1000".U) {
+		// hazard in MEM/WB stage forward data from register file write data which will have correct data from the MEM/WB mux
+		Jalr.io.rs1 := reg.io.WriteData
+		branchLogic.io.in_rs1 := reg.io.rs1
+	} .elsewhen(decodeForward.io.forward_rs1 === "b1001".U) {
+		// hazard in EX/MEM stage and load type instruction so forwarding from data memory data output instead of EX/MEM.alu_output
+		Jalr.io.rs1 := DataMemory.io.instRead
+		branchLogic.io.in_rs1 := reg.io.rs1
+	} .elsewhen(decodeForward.io.forward_rs1 === "b1010".U) {
+		// hazard in MEM/WB stage and load type instruction so forwarding from register file write data which will have the correct output from the mux
+		Jalr.io.rs1 := reg.io.WriteData
 		branchLogic.io.in_rs1 := reg.io.rs1
 	}
-	// / FOR REGISTER RS2 in BRANCH LOGIC UNIT
-	when(decodeForward.io.forward_rs2 === "b000".U) {
+	.otherwise {
+		branchLogic.io.in_rs1 := reg.io.rs1
+		Jalr.io.rs1 := reg.io.rs1
+	}
+
+		// FOR REGISTER RS2 in BRANCH LOGIC UNIT
+	when(decodeForward.io.forward_rs2 === "b0000".U) {
 	// No hazard just use register file data
 	branchLogic.io.in_rs2 := reg.io.rs2
-	} .elsewhen(decodeForward.io.forward_rs2 === "b001".U) {
+	} .elsewhen(decodeForward.io.forward_rs2 === "b0001".U) {
 	// hazard in alu stage forward data from alu output
 	branchLogic.io.in_rs2 := Alu.io.out
-	} .elsewhen(decodeForward.io.forward_rs2 === "b010".U) {
+	} .elsewhen(decodeForward.io.forward_rs2 === "b0010".U) {
 	// hazard in EX/MEM stage forward data from EX/MEM.alu_output
 	branchLogic.io.in_rs2 := EX_MEM.io.aluOutput_out
-	} .elsewhen(decodeForward.io.forward_rs2 === "b011".U) {
+	} .elsewhen(decodeForward.io.forward_rs2 === "b0011".U) {
 	// hazard in MEM/WB stage forward data from register file write data which will have correct data from the MEM/WB mux
 	branchLogic.io.in_rs2 := reg.io.WriteData
-	} .elsewhen(decodeForward.io.forward_rs2 === "b100".U) {
+	} .elsewhen(decodeForward.io.forward_rs2 === "b0100".U) {
 	// hazard in EX/MEM stage and load type instruction so forwarding from data memory data output instead of EX/MEM.alu_output
 	branchLogic.io.in_rs2 := DataMemory.io.instRead
-	} .elsewhen(decodeForward.io.forward_rs2 === "b101".U) {
+	} .elsewhen(decodeForward.io.forward_rs2 === "b0101".U) {
 	// hazard in MEM/WB stage and load type instruction so forwarding from register file write data which will have the correct output from the mux
 	branchLogic.io.in_rs2 := reg.io.WriteData
 	}
 	.otherwise {
 		branchLogic.io.in_rs2 := reg.io.rs2
-  }
+	}
+
 	//  Decode execute  pipeline  inputs
 	// control signals 
 	ID_EXE.io.memWrite_in := Control.io.MemWrite
@@ -282,7 +314,7 @@ class Top extends Module {
 	hazardDetection.io.ID_EX_REGRD := ID_EXE.io.rd_out
 	hazardDetection.io.pc_in := IF_ID.io.pc4_out
 	hazardDetection.io.current_pc := IF_ID.io.pc_out
-	
+
 	// Alu
 	// mux opA
 	when (ID_EXE.io.operandAsel_out === "b10".U){
