@@ -31,20 +31,21 @@ class Top extends Module {
 	val decodeForward =Module(new DecodeForwardUnit())
 	val structuralDetector =Module(new StructuralDetector())
 	// wiring
-	// memory and pc
-	
+	//-----------------------------------------------IF------------------
+	//  pc
 	Pc.io.input:=Pc.io.pc4
+	// instructions 
 	Memory.io.WriteAddr := Pc.io.pc(11,2)
 	val inst = Memory.io.ReadData
 	io.addr:=Memory.io.WriteAddr
 	
 
-	//  pipeline fetch Module inputs
+	//  if-id inputs
 	IF_ID.io.pc_in :=Pc.io.pc
 	IF_ID.io.pc4_in :=Pc.io.pc4
 	IF_ID.io.ins_in := inst
 
-
+	// opcode
 	Control.io.Op_code:= IF_ID.io.ins_out(6,0) // opcode 7 bits , 
 	// reg 
 	reg.io.RegWrite := MEM_WR.io.regWrite_out
@@ -52,9 +53,15 @@ class Top extends Module {
 	reg.io.reg2:= IF_ID.io.ins_out(24,20)
 	reg.io.rd:=MEM_WR.io.rd_out
 
-	// instruction
+	// immediate generation
 	ImmediateGeneration.io.instr:=IF_ID.io.ins_out
 	ImmediateGeneration.io.PC:= IF_ID.io.pc_out
+		// Alucntrl
+	AluControl.io.AluOp:= ID_EXE.io.aluOp_out
+	AluControl.io.funct3:= ID_EXE.io.func3_out
+	AluControl.io.funct7:= ID_EXE.io.func7_out
+	
+	Alu.io.alucnt:=AluControl.io.alucnt
 
 	//  Decode execute  pipeline  inputs
 	// control signals 
@@ -91,10 +98,7 @@ class Top extends Module {
 	}.otherwise {
     	ID_EXE.io.imm := 0.S(32.W)
 	}
-		// Alucntrl
-	AluControl.io.AluOp:= ID_EXE.io.aluOp_out
-	AluControl.io.funct3:= ID_EXE.io.func3_out
-	AluControl.io.funct7:= ID_EXE.io.func7_out
+	
 
 		// Alu
 	// mux opA
@@ -311,7 +315,7 @@ class Top extends Module {
 	
 
 
-	Alu.io.alucnt:=AluControl.io.alucnt
+	
 	// datamemory
 	DataMemory.io.Addr:=(EX_MEM.io.aluOutput_out(9,2)).asUInt
 	DataMemory.io.Data:= EX_MEM.io.rs2_out
