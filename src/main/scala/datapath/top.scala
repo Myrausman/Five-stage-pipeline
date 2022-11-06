@@ -48,14 +48,26 @@ class Top extends Module {
 	// opcode
 	Control.io.Op_code:= IF_ID.io.ins_out(6,0) // opcode 7 bits , 
 	// reg 
-	reg.io.RegWrite := MEM_WR.io.regWrite_out
+	
 	reg.io.reg1:= IF_ID.io.ins_out(19,15)
 	reg.io.reg2:= IF_ID.io.ins_out(24,20)
-	reg.io.rd:=MEM_WR.io.rd_out
-
 	// immediate generation
 	ImmediateGeneration.io.instr:=IF_ID.io.ins_out
 	ImmediateGeneration.io.PC:= IF_ID.io.pc_out
+	// immediate generation
+	when(Control.io.ExtSel === "b00".U) {
+    // I-Type instruction
+    	ID_EXE.io.imm := ImmediateGeneration.io.i_imm,
+	}.elsewhen(Control.io.ExtSel === "b01".U) {
+    // S-Type instruction
+    	ID_EXE.io.imm := ImmediateGeneration.io.s_imm,
+	}.elsewhen(Control.io.ExtSel === "b10".U) {
+    // U-Type instruction
+    	ID_EXE.io.imm := ImmediateGeneration.io.u_imm,
+	}.otherwise {
+    	ID_EXE.io.imm := 0.S(32.W)
+	}
+
 		// Alucntrl
 	AluControl.io.AluOp:= ID_EXE.io.aluOp_out
 	AluControl.io.funct3:= ID_EXE.io.func3_out
@@ -63,6 +75,61 @@ class Top extends Module {
 	
 	Alu.io.alucnt:=AluControl.io.alucnt
 
+		// Initializing Branch Forward Unit
+	decodeForward.io.ID_EX_REGRD := ID_EXE.io.rd_out
+	decodeForward.io.ID_EX_MEMRD := ID_EXE.io.memRead_out
+	decodeForward.io.EX_MEM_REGRD := EX_MEM.io.rd_out
+	decodeForward.io.MEM_WB_REGRD := MEM_WR.io.rd_out
+	decodeForward.io.EX_MEM_MEMRD := EX_MEM.io.memRead_out
+	decodeForward.io.MEM_WB_MEMRD := MEM_WR.io.MemRead_out
+	decodeForward.io.rs1_sel := IF_ID.io.ins_out(19, 15)
+	decodeForward.io.rs2_sel := IF_ID.io.ins_out(24, 20)
+	decodeForward.io.ctrl_branch := Control.io.Branch
+	// FOR REGISTER RS1 in BRANCH LOGIC UNIT
+	when(decodeForward.io.forward_rs1 === "b000".U) {
+	// No hazard just use register file data
+		branchLogic.io.in_rs1 := reg.io.rs1
+	}.elsewhen(decodeForward.io.forward_rs1 === "b001".U) {
+	// hazard in alu stage forward data from alu output
+		branchLogic.io.in_rs1 := Alu.io.out
+	}.elsewhen(decodeForward.io.forward_rs1 === "b010".U) {
+	// hazard in EX/MEM stage forward data from EX/MEM.alu_output
+		branchLogic.io.in_rs1 := EX_MEM.io.aluOutput_out
+	} .elsewhen(decodeForward.io.forward_rs1 === "b011".U) {
+	// hazard in MEM/WB stage forward data from register file write data which will have correct data from the MEM/WB mux
+		branchLogic.io.in_rs1 := reg.io.WriteData
+	}.elsewhen(decodeForward.io.forward_rs1 === "b100".U) {
+	// hazard in EX/MEM stage and load type instruction so forwarding from data memory data output instead of EX/MEM.alu_output
+		branchLogic.io.in_rs1 := DataMemory.io.instRead
+	}.elsewhen(decodeForward.io.forward_rs1 === "b101".U) {
+	// hazard in MEM/WB stage and load type instruction so forwarding from register file write data which will have the correct output from the mux
+		branchLogic.io.in_rs1 := reg.io.WriteData
+	}.otherwise {
+		branchLogic.io.in_rs1 := reg.io.rs1
+	}
+	// / FOR REGISTER RS2 in BRANCH LOGIC UNIT
+	when(decodeForward.io.forward_rs2 === "b000".U) {
+	// No hazard just use register file data
+	branchLogic.io.in_rs2 := reg.io.rs2
+	} .elsewhen(decodeForward.io.forward_rs2 === "b001".U) {
+	// hazard in alu stage forward data from alu output
+	branchLogic.io.in_rs2 := Alu.io.out
+	} .elsewhen(decodeForward.io.forward_rs2 === "b010".U) {
+	// hazard in EX/MEM stage forward data from EX/MEM.alu_output
+	branchLogic.io.in_rs2 := EX_MEM.io.aluOutput_out
+	} .elsewhen(decodeForward.io.forward_rs2 === "b011".U) {
+	// hazard in MEM/WB stage forward data from register file write data which will have correct data from the MEM/WB mux
+	branchLogic.io.in_rs2 := reg.io.WriteData
+	} .elsewhen(decodeForward.io.forward_rs2 === "b100".U) {
+	// hazard in EX/MEM stage and load type instruction so forwarding from data memory data output instead of EX/MEM.alu_output
+	branchLogic.io.in_rs2 := DataMemory.io.instRead
+	} .elsewhen(decodeForward.io.forward_rs2 === "b101".U) {
+	// hazard in MEM/WB stage and load type instruction so forwarding from register file write data which will have the correct output from the mux
+	branchLogic.io.in_rs2 := reg.io.WriteData
+	}
+	.otherwise {
+		branchLogic.io.in_rs2 := reg.io.rs2
+  }
 	//  Decode execute  pipeline  inputs
 	// control signals 
 	ID_EXE.io.memWrite_in := Control.io.MemWrite
@@ -85,71 +152,12 @@ class Top extends Module {
 	ID_EXE.io.operandA_in := reg.io.rs1
 	ID_EXE.io.operandB_in:= reg.io.rs2
 
-	// immediate generation
-	when(Control.io.ExtSel === "b00".U) {
-    // I-Type instruction
-    	ID_EXE.io.imm := ImmediateGeneration.io.i_imm,
-	}.elsewhen(Control.io.ExtSel === "b01".U) {
-    // S-Type instruction
-    	ID_EXE.io.imm := ImmediateGeneration.io.s_imm,
-	}.elsewhen(Control.io.ExtSel === "b10".U) {
-    // U-Type instruction
-    	ID_EXE.io.imm := ImmediateGeneration.io.u_imm,
-	}.otherwise {
-    	ID_EXE.io.imm := 0.S(32.W)
-	}
+
 	
 
-		// Alu
-	// mux opA
-	when (ID_EXE.io.operandAsel_out === "b10".U){
-		Alu.io.in1:= ID_EXE.io.pc4_out.asSInt
-  	}.otherwise {
-		Alu.io.in1:= MuxCase(0.S,Array(
-		(forwardUnit.io.forward_a === 0.U) -> ID_EXE.io.operandA_out,
-		(forwardUnit.io.forward_a ===  1.U ) -> EX_MEM.io.aluOutput_out,
-		(forwardUnit.io.forward_a === 2.U )-> reg.io.WriteData,
-		(forwardUnit.io.forward_a=== 3.U ) -> ID_EXE.io.operandA_out
-	))}
 
 
-
-	// mux opb
-	// Controlling Operand B for ALU
-	when(ID_EXE.io.operandBsel_out=== 1.U) {
-		Alu.io.in2 := ID_EXE.io.imm_out
-
-		when(forwardUnit.io.forward_b === 0.U) {
-		EX_MEM.io.rs2 := ID_EXE.io.operandB_out
-		} .elsewhen(forwardUnit.io.forward_b === 1.U) {
-		EX_MEM.io.rs2 := EX_MEM.io.aluOutput_out
-		} .elsewhen(forwardUnit.io.forward_b === 2.U) {
-		EX_MEM.io.rs2  := reg.io.WriteData
-		} .otherwise {
-		EX_MEM.io.rs2 := ID_EXE.io.operandB_out
-		}
-	} 
- 
-	.otherwise {
-		when(forwardUnit.io.forward_b === "b00".U) {
-			Alu.io.in2:= ID_EXE.io.operandB_out
-			EX_MEM.io.rs2 := ID_EXE.io.operandB_out
-		} .elsewhen(forwardUnit.io.forward_b === "b01".U) {
-			Alu.io.in2:= EX_MEM.io.aluOutput_out
-			EX_MEM.io.rs2 := EX_MEM.io.aluOutput_out
-		} .elsewhen(forwardUnit.io.forward_b === "b10".U) {
-			Alu.io.in2:= reg.io.WriteData
-			EX_MEM.io.rs2 := reg.io.WriteData
-		} .otherwise {
-			Alu.io.in2:= ID_EXE.io.operandB_out
-			EX_MEM.io.rs2  := ID_EXE.io.operandB_out
-		}}
-
-	hazardDetection.io.IF_ID_INST := IF_ID.io.ins_out
-	hazardDetection.io.ID_EX_MEMREAD := ID_EXE.io.memRead_out
-	hazardDetection.io.ID_EX_REGRD := ID_EXE.io.rd_out
-	hazardDetection.io.pc_in := IF_ID.io.pc4_out
-	hazardDetection.io.current_pc := IF_ID.io.pc_out
+	
 
 	when(hazardDetection.io.inst_forward === "b1".U) {
 		IF_ID.io.ins_in  := hazardDetection.io.inst_out
@@ -211,92 +219,14 @@ class Top extends Module {
     ID_EXE.io.NextPc := Control.io.NextPc 
 
 	}
-		// Initializing Branch Forward Unit
-	decodeForward.io.ID_EX_REGRD := ID_EXE.io.rd_out
-	decodeForward.io.ID_EX_MEMRD := ID_EXE.io.memRead_out
-	decodeForward.io.EX_MEM_REGRD := EX_MEM.io.rd_out
-	decodeForward.io.MEM_WB_REGRD := MEM_WR.io.rd_out
-	decodeForward.io.EX_MEM_MEMRD := EX_MEM.io.memRead_out
-	decodeForward.io.MEM_WB_MEMRD := MEM_WR.io.MemRead_out
-	decodeForward.io.rs1_sel := IF_ID.io.ins_out(19, 15)
-	decodeForward.io.rs2_sel := IF_ID.io.ins_out(24, 20)
-	decodeForward.io.ctrl_branch := Control.io.Branch
-	// FOR REGISTER RS1 in BRANCH LOGIC UNIT
-	when(decodeForward.io.forward_rs1 === "b000".U) {
-	// No hazard just use register file data
-		branchLogic.io.in_rs1 := reg.io.rs1
-	}.elsewhen(decodeForward.io.forward_rs1 === "b001".U) {
-	// hazard in alu stage forward data from alu output
-		branchLogic.io.in_rs1 := Alu.io.out
-	}.elsewhen(decodeForward.io.forward_rs1 === "b010".U) {
-	// hazard in EX/MEM stage forward data from EX/MEM.alu_output
-		branchLogic.io.in_rs1 := EX_MEM.io.aluOutput_out
-	} .elsewhen(decodeForward.io.forward_rs1 === "b011".U) {
-	// hazard in MEM/WB stage forward data from register file write data which will have correct data from the MEM/WB mux
-		branchLogic.io.in_rs1 := reg.io.WriteData
-	}.elsewhen(decodeForward.io.forward_rs1 === "b100".U) {
-	// hazard in EX/MEM stage and load type instruction so forwarding from data memory data output instead of EX/MEM.alu_output
-		branchLogic.io.in_rs1 := DataMemory.io.instRead
-	}.elsewhen(decodeForward.io.forward_rs1 === "b101".U) {
-	// hazard in MEM/WB stage and load type instruction so forwarding from register file write data which will have the correct output from the mux
-		branchLogic.io.in_rs1 := reg.io.WriteData
-	}.otherwise {
-		branchLogic.io.in_rs1 := reg.io.rs1
-	}
-	// / FOR REGISTER RS2 in BRANCH LOGIC UNIT
-	when(decodeForward.io.forward_rs2 === "b000".U) {
-	// No hazard just use register file data
-	branchLogic.io.in_rs2 := reg.io.rs2
-	} .elsewhen(decodeForward.io.forward_rs2 === "b001".U) {
-	// hazard in alu stage forward data from alu output
-	branchLogic.io.in_rs2 := Alu.io.out
-	} .elsewhen(decodeForward.io.forward_rs2 === "b010".U) {
-	// hazard in EX/MEM stage forward data from EX/MEM.alu_output
-	branchLogic.io.in_rs2 := EX_MEM.io.aluOutput_out
-	} .elsewhen(decodeForward.io.forward_rs2 === "b011".U) {
-	// hazard in MEM/WB stage forward data from register file write data which will have correct data from the MEM/WB mux
-	branchLogic.io.in_rs2 := reg.io.WriteData
-	} .elsewhen(decodeForward.io.forward_rs2 === "b100".U) {
-	// hazard in EX/MEM stage and load type instruction so forwarding from data memory data output instead of EX/MEM.alu_output
-	branchLogic.io.in_rs2 := DataMemory.io.instRead
-	} .elsewhen(decodeForward.io.forward_rs2 === "b101".U) {
-	// hazard in MEM/WB stage and load type instruction so forwarding from register file write data which will have the correct output from the mux
-	branchLogic.io.in_rs2 := reg.io.WriteData
-	}
-	.otherwise {
-		branchLogic.io.in_rs2 := reg.io.rs2
-  }
-	// EXecute Memory stage
-	EX_MEM.io.memWrite_in := ID_EXE.io.memWrite_out
-	EX_MEM.io.memRead_in := ID_EXE.io.memRead_out
-	EX_MEM.io.memToReg_in := ID_EXE.io.memToReg_out
-	EX_MEM.io.regWrite_in := ID_EXE.io.regWrite_out
-	EX_MEM.io.rd_in := ID_EXE.io.rd_out
-	EX_MEM.io.aluOutput_in := Alu.io.out
-	// EX_MEM.io.rs2Sel_in:=ID_EXE.io.operandBsel_out
-	EX_MEM.io.rs2:=ID_EXE.io.operandB_out
-	// val strData_in = Input(SInt(32.W))
+	
+	
 	forwardUnit.io.EX_MEM_REGRD := EX_MEM.io.rd_out 
 	forwardUnit.io.MEM_WB_REGRD := MEM_WR.io.rd_out
 	forwardUnit.io.ID_EX_REGRS1 := ID_EXE.io.rs1Ins_out
 	forwardUnit.io.ID_EX_REGRS2 := ID_EXE.io.rs2Ins_out
 	forwardUnit.io.EX_MEM_REGWR := EX_MEM.io.regWrite_out 
 	forwardUnit.io.MEM_WB_REGWR := MEM_WR.io.regWrite_out
-
-
-	// MEmwriteback stage
-	MEM_WR.io.memToReg_in:= EX_MEM.io.memToReg_out
-	MEM_WR.io.regWrite_in:=EX_MEM.io.regWrite_out
-	MEM_WR.io.MemRead_in:=EX_MEM.io.memRead_out
-	MEM_WR.io.rd_in :=EX_MEM.io.rd_out
-	MEM_WR.io.dataOut_in :=DataMemory.io.instRead
-	MEM_WR.io.aluOutput_in :=EX_MEM.io.aluOutput_out
-	
-	MEM_WR.io.memWrite_in:=EX_MEM.io.memWrite_out
-
-	
-	
-	
 
 	// // Branch
 	// Branch.io.alucnt:=AluControl.io.alucnt
@@ -316,17 +246,7 @@ class Top extends Module {
 
 
 	
-	// datamemory
-	DataMemory.io.Addr:=(EX_MEM.io.aluOutput_out(9,2)).asUInt
-	DataMemory.io.Data:= EX_MEM.io.rs2_out
-	DataMemory.io.MemWrite:= EX_MEM.io.memWrite_out
-	DataMemory.io.MemRead:= EX_MEM.io.memRead_out
-	// mem to reg
-	reg.io.WriteData:= MuxCase(0.S,Array(
-		(MEM_WR.io.memToReg_out === 0.U) -> MEM_WR.io.aluOutput_out,
-		// testing
-		(MEM_WR.io.memToReg_out  === 1.U) -> DataMemory.io.instRead
-		))
+	
 	
 	Pc.io.input := MuxCase(0.U,Array(
 		(Control.io.NextPc === 0.U) -> Pc.io.pc4,
@@ -352,10 +272,89 @@ class Top extends Module {
 	}
 	// FOR RS2
 	when(structuralDetector.io.fwd_rs2 === 1.U) {
-	ID_EXE.io.operandB_in := reg.io.WriteData
+		ID_EXE.io.operandB_in := reg.io.WriteData
 	} .otherwise {
-	ID_EXE.io.operandB_in := reg.io.rs2
+		ID_EXE.io.operandB_in := reg.io.rs2
 	}
+	// hazard detection
+	hazardDetection.io.IF_ID_INST := IF_ID.io.ins_out
+	hazardDetection.io.ID_EX_MEMREAD := ID_EXE.io.memRead_out
+	hazardDetection.io.ID_EX_REGRD := ID_EXE.io.rd_out
+	hazardDetection.io.pc_in := IF_ID.io.pc4_out
+	hazardDetection.io.current_pc := IF_ID.io.pc_out
+	
+	// Alu
+	// mux opA
+	when (ID_EXE.io.operandAsel_out === "b10".U){
+		Alu.io.in1:= ID_EXE.io.pc4_out.asSInt
+  	}.otherwise {
+		Alu.io.in1:= MuxCase(0.S,Array(
+		(forwardUnit.io.forward_a === 0.U) -> ID_EXE.io.operandA_out,
+		(forwardUnit.io.forward_a ===  1.U ) -> EX_MEM.io.aluOutput_out,
+		(forwardUnit.io.forward_a === 2.U )-> reg.io.WriteData,
+		(forwardUnit.io.forward_a=== 3.U ) -> ID_EXE.io.operandA_out
+	))}
 
+	// Controlling Operand B for ALU
+	when(ID_EXE.io.operandBsel_out=== 1.U) {
+		Alu.io.in2 := ID_EXE.io.imm_out
 
+		when(forwardUnit.io.forward_b === 0.U) {
+		EX_MEM.io.rs2 := ID_EXE.io.operandB_out
+		} .elsewhen(forwardUnit.io.forward_b === 1.U) {
+		EX_MEM.io.rs2 := EX_MEM.io.aluOutput_out
+		} .elsewhen(forwardUnit.io.forward_b === 2.U) {
+		EX_MEM.io.rs2  := reg.io.WriteData
+		} .otherwise {
+		EX_MEM.io.rs2 := ID_EXE.io.operandB_out
+		}
+	}.otherwise {
+		when(forwardUnit.io.forward_b === "b00".U) {
+			Alu.io.in2:= ID_EXE.io.operandB_out
+			EX_MEM.io.rs2 := ID_EXE.io.operandB_out
+		} .elsewhen(forwardUnit.io.forward_b === "b01".U) {
+			Alu.io.in2:= EX_MEM.io.aluOutput_out
+			EX_MEM.io.rs2 := EX_MEM.io.aluOutput_out
+		} .elsewhen(forwardUnit.io.forward_b === "b10".U) {
+			Alu.io.in2:= reg.io.WriteData
+			EX_MEM.io.rs2 := reg.io.WriteData
+		} .otherwise {
+			Alu.io.in2:= ID_EXE.io.operandB_out
+			EX_MEM.io.rs2  := ID_EXE.io.operandB_out
+		}}
+
+	// EXecute Memory stage
+	EX_MEM.io.memWrite_in := ID_EXE.io.memWrite_out
+	EX_MEM.io.memRead_in := ID_EXE.io.memRead_out
+	EX_MEM.io.memToReg_in := ID_EXE.io.memToReg_out
+	EX_MEM.io.regWrite_in := ID_EXE.io.regWrite_out
+	EX_MEM.io.rd_in := ID_EXE.io.rd_out
+	EX_MEM.io.aluOutput_in := Alu.io.out
+	// EX_MEM.io.rs2Sel_in:=ID_EXE.io.operandBsel_out
+	EX_MEM.io.rs2:=ID_EXE.io.operandB_out
+	// val strData_in = Input(SInt(32.W))
+	
+	// datamemory
+	DataMemory.io.Addr:=(EX_MEM.io.aluOutput_out(9,2)).asUInt
+	DataMemory.io.Data:= EX_MEM.io.rs2_out
+	DataMemory.io.MemWrite:= EX_MEM.io.memWrite_out
+	DataMemory.io.MemRead:= EX_MEM.io.memRead_out
+
+	// MEmwriteback stage
+	MEM_WR.io.memToReg_in:= EX_MEM.io.memToReg_out
+	MEM_WR.io.regWrite_in:=EX_MEM.io.regWrite_out
+	MEM_WR.io.MemRead_in:=EX_MEM.io.memRead_out
+	MEM_WR.io.rd_in :=EX_MEM.io.rd_out
+	MEM_WR.io.dataOut_in :=DataMemory.io.instRead
+	MEM_WR.io.aluOutput_in :=EX_MEM.io.aluOutput_out
+	MEM_WR.io.memWrite_in:=EX_MEM.io.memWrite_out
+
+	// mem to reg
+	reg.io.WriteData:= MuxCase(0.S,Array(
+		(MEM_WR.io.memToReg_out === 0.U) -> MEM_WR.io.aluOutput_out,
+		// testing
+		(MEM_WR.io.memToReg_out  === 1.U) -> DataMemory.io.instRead
+		))
+	reg.io.RegWrite := MEM_WR.io.regWrite_out
+	reg.io.rd:=MEM_WR.io.rd_out
 }
