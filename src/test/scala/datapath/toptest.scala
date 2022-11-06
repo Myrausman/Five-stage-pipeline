@@ -6,6 +6,6 @@ class five_cycle_test extends FreeSpec with ChiselScalatestTester{
     "5 stage cycle risc v" in {
         test(new Top){ c =>
         // c.io.RegWrite.poke(1.U)
-        c.clock.step(18)
+        c.clock.step(100)
     }
 }}

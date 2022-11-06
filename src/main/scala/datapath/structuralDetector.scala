@@ -1,3 +1,6 @@
+package datapath
+import chisel3._
+import chisel3.util._
 class StructuralDetector extends Module {
   val io = IO(new Bundle {
     val rs1_sel = Input(UInt(5.W))

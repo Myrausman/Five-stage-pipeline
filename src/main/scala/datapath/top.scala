@@ -29,6 +29,7 @@ class Top extends Module {
 	val hazardDetection = Module(new HazardDetection())
 	val branchLogic =Module(new BranchLogic())
 	val decodeForward =Module(new DecodeForwardUnit())
+	val structuralDetector =Module(new StructuralDetector())
 	// wiring
 	// memory and pc
 	
@@ -335,6 +336,22 @@ class Top extends Module {
 	branchLogic.io.in_func3 := IF_ID.io.ins_out(14,12)
 
 	
+	structuralDetector.io.rs1_sel := IF_ID.io.ins_out(19, 15)
+	structuralDetector.io.rs2_sel := IF_ID.io.ins_out(24, 20)
+	structuralDetector.io.MEM_WB_REGRD := MEM_WR.io.rd_out
+	structuralDetector.io.MEM_WB_regWr := MEM_WR.io.regWrite_out
+	// FOR RS1
+	when(structuralDetector.io.fwd_rs1 === 1.U) {
+	ID_EXE.io.operandA_in := reg.io.WriteData
+	} .otherwise {
+	ID_EXE.io.operandA_in := reg.io.rs1
+	}
+	// FOR RS2
+	when(structuralDetector.io.fwd_rs2 === 1.U) {
+	ID_EXE.io.operandB_in := reg.io.WriteData
+	} .otherwise {
+	ID_EXE.io.operandB_in := reg.io.rs2
+	}
 
 
 }
