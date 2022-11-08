@@ -121,7 +121,7 @@ class control_decode extends Module {
             io.MemtoReg := 0.U
             io.AluOp := 5.U
             io.OpA := 0.U
-            io.OpB := 2.U
+            io.OpB := 1.U
             io.ExtSel := 1.U
             io.NextPc := 0.U
         }
