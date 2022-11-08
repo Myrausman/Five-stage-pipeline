@@ -32,6 +32,13 @@ class Top extends Module {
 	val structuralDetector =Module(new StructuralDetector())
 	// wiring
 	//-----------------------------------------------IF------------------
+	forwardUnit.io.EX_MEM_REGRD := EX_MEM.io.rd_out 
+	forwardUnit.io.MEM_WB_REGRD := MEM_WR.io.rd_out
+	forwardUnit.io.ID_EX_REGRS1 := ID_EXE.io.rs1Ins_out
+	forwardUnit.io.ID_EX_REGRS2 := ID_EXE.io.rs2Ins_out
+	forwardUnit.io.EX_MEM_REGWR := EX_MEM.io.regWrite_out 
+	forwardUnit.io.MEM_WB_REGWR := MEM_WR.io.regWrite_out
+	io.Reg_Out:=0.S
 	//  pc
 	Pc.io.input:=Pc.io.pc4
 	// instructions 
@@ -112,7 +119,7 @@ class Top extends Module {
     ID_EXE.io.NextPc := Control.io.NextPc 
 
 	}
-	Alu.io.alucnt:=AluControl.io.alucnt
+	
 
 	// Initializing Branch Forward Unit
 	decodeForward.io.ID_EX_REGRD := ID_EXE.io.rd_out
@@ -209,6 +216,42 @@ class Top extends Module {
 		branchLogic.io.in_rs2 := reg.io.rs2
 	}
 
+	
+	
+	//  Decode execute  pipeline  inputs
+	// control signals 
+	ID_EXE.io.pc_in := IF_ID.io.pc_out
+	ID_EXE.io.pc4_in := IF_ID.io.pc4_out
+	ID_EXE.io.memWrite_in := Control.io.MemWrite
+	ID_EXE.io.memRead_in := Control.io.MemRead
+	ID_EXE.io.regWrite_in := Control.io.RegWrite
+	ID_EXE.io.memToReg_in :=Control.io.MemtoReg
+	ID_EXE.io.aluOp_in := Control.io.AluOp
+	ID_EXE.io.operandAsel_in:= Control.io.OpA
+	ID_EXE.io.operandBsel_in:= Control.io.OpB
+	ID_EXE.io.br_en_in := Control.io.Branch
+	ID_EXE.io.NextPc := Control.io.NextPc
+	ID_EXE.io.func3_in := IF_ID.io.ins_out(14,12)
+	ID_EXE.io.func7_in := IF_ID.io.ins_out(30)
+	ID_EXE.io.rs1Ins_in:= IF_ID.io.ins_out(19,15)
+	ID_EXE.io.rs2Ins_in := IF_ID.io.ins_out(24,20)
+	ID_EXE.io.rd_in := IF_ID.io.ins_out(11,7)
+	ID_EXE.io.operandA_in := reg.io.rs1
+	ID_EXE.io.operandB_in:= reg.io.rs2
+	
+	// hazard detection
+	hazardDetection.io.IF_ID_INST := IF_ID.io.ins_out
+	hazardDetection.io.ID_EX_MEMREAD := ID_EXE.io.memRead_out
+	hazardDetection.io.ID_EX_REGRD := ID_EXE.io.rd_out
+	hazardDetection.io.pc_in := IF_ID.io.pc4_out
+	hazardDetection.io.current_pc := IF_ID.io.pc_out
+	
+	when(hazardDetection.io.inst_forward === "b1".U) {
+    	IF_ID.io.ins_in  := hazardDetection.io.inst_out
+    	IF_ID.io.pc_in := hazardDetection.io.current_pc_out
+     }.otherwise {
+        IF_ID.io.ins_in := Memory.io.ReadData
+    }
 	when(hazardDetection.io.pc_forward === "b1".U) {
   		Pc.io.input := hazardDetection.io.pc_out
 	}.otherwise {
@@ -236,52 +279,16 @@ class Top extends Module {
       Pc.io.input := Pc.io.pc4
     }
 	}
-	// when(hazardDetection.io.inst_forward === "b1".U) {
-	// 	IF_ID.io.ins_in  := hazardDetection.io.inst_out
-	// 	IF_ID.io.pc_in := hazardDetection.io.current_pc_out
-	// } .otherwise {
-	// 	IF_ID.io.ins_in := Memory.io.ReadData
-	// }
-	
-	//  Decode execute  pipeline  inputs
-	// control signals 
-	ID_EXE.io.pc_in := IF_ID.io.pc_out
-	ID_EXE.io.pc4_in := IF_ID.io.pc4_out
-	ID_EXE.io.memWrite_in := Control.io.MemWrite
-	ID_EXE.io.memRead_in := Control.io.MemRead
-	ID_EXE.io.regWrite_in := Control.io.RegWrite
-	ID_EXE.io.memToReg_in :=Control.io.MemtoReg
-	ID_EXE.io.aluOp_in := Control.io.AluOp
-	ID_EXE.io.operandAsel_in:= Control.io.OpA
-	ID_EXE.io.operandBsel_in:= Control.io.OpB
-	ID_EXE.io.br_en_in := Control.io.Branch
-	ID_EXE.io.NextPc := Control.io.NextPc
-	ID_EXE.io.func3_in := IF_ID.io.ins_out(14,12)
-	ID_EXE.io.func7_in := IF_ID.io.ins_out(30)
-	ID_EXE.io.rs1Ins_in:= IF_ID.io.ins_out(19,15)
-	ID_EXE.io.rs2Ins_in := IF_ID.io.ins_out(24,20)
-	ID_EXE.io.rd_in := IF_ID.io.ins_out(11,7)
-	ID_EXE.io.operandA_in := reg.io.rs1
-	ID_EXE.io.operandB_in:= reg.io.rs2
-	
-	forwardUnit.io.EX_MEM_REGRD := EX_MEM.io.rd_out 
-	forwardUnit.io.MEM_WB_REGRD := MEM_WR.io.rd_out
-	forwardUnit.io.ID_EX_REGRS1 := ID_EXE.io.rs1Ins_out
-	forwardUnit.io.ID_EX_REGRS2 := ID_EXE.io.rs2Ins_out
-	forwardUnit.io.EX_MEM_REGWR := EX_MEM.io.regWrite_out 
-	forwardUnit.io.MEM_WB_REGWR := MEM_WR.io.regWrite_out
-	io.Reg_Out:=0.S
-	
-	
-	
-	// hazard detection
-	hazardDetection.io.IF_ID_INST := IF_ID.io.ins_out
-	hazardDetection.io.ID_EX_MEMREAD := ID_EXE.io.memRead_out
-	hazardDetection.io.ID_EX_REGRD := ID_EXE.io.rd_out
-	hazardDetection.io.pc_in := IF_ID.io.pc4_out
-	hazardDetection.io.current_pc := IF_ID.io.pc_out
-
+	// EXecute Memory stage
+	EX_MEM.io.memWrite_in := ID_EXE.io.memWrite_out
+	EX_MEM.io.memRead_in := ID_EXE.io.memRead_out
+	EX_MEM.io.memToReg_in := ID_EXE.io.memToReg_out
+	EX_MEM.io.regWrite_in := ID_EXE.io.regWrite_out
+	EX_MEM.io.rd_in := ID_EXE.io.rd_out
+	EX_MEM.io.aluOutput_in := Alu.io.out
+	// EX_MEM.io.rs2:=ID_EXE.io.operandB_out
 	// Alu
+	Alu.io.alucnt:=AluControl.io.alucnt
 	// mux opA
 	when (ID_EXE.io.operandAsel_out === "b10".U){
 		Alu.io.in1:= ID_EXE.io.pc4_out.asSInt
@@ -300,14 +307,15 @@ class Top extends Module {
 		when(forwardUnit.io.forward_b === 0.U) {
 		EX_MEM.io.rs2 := ID_EXE.io.operandB_out
 		} .elsewhen(forwardUnit.io.forward_b === 1.U) {
-		EX_MEM.io.rs2 := EX_MEM.io.aluOutput_out
+			EX_MEM.io.rs2 := EX_MEM.io.aluOutput_out
 		} .elsewhen(forwardUnit.io.forward_b === 2.U) {
-		EX_MEM.io.rs2  := reg.io.WriteData
+			EX_MEM.io.rs2  := reg.io.WriteData
+		
 		} .otherwise {
 		EX_MEM.io.rs2 := ID_EXE.io.operandB_out
 		}
 	}.otherwise {
-		when(forwardUnit.io.forward_b === "b00".U) {
+		when(forwardUnit.io.forward_b === 0.U) {
 			Alu.io.in2:= ID_EXE.io.operandB_out
 			EX_MEM.io.rs2 := ID_EXE.io.operandB_out
 		} .elsewhen(forwardUnit.io.forward_b === "b01".U) {
@@ -321,18 +329,11 @@ class Top extends Module {
 			EX_MEM.io.rs2  := ID_EXE.io.operandB_out
 		}}
 
-	// EXecute Memory stage
-	EX_MEM.io.memWrite_in := ID_EXE.io.memWrite_out
-	EX_MEM.io.memRead_in := ID_EXE.io.memRead_out
-	EX_MEM.io.memToReg_in := ID_EXE.io.memToReg_out
-	EX_MEM.io.regWrite_in := ID_EXE.io.regWrite_out
-	EX_MEM.io.rd_in := ID_EXE.io.rd_out
-	EX_MEM.io.aluOutput_in := Alu.io.out
-	EX_MEM.io.rs2:=ID_EXE.io.operandB_out
+	
 	
 	// datamemory
-	DataMemory.io.Addr:=(EX_MEM.io.aluOutput_out(11,2)).asUInt
-	DataMemory.io.Data:= EX_MEM.io.rs2_out
+	DataMemory.io.Addr:=(EX_MEM.io.aluOutput_out).asUInt
+	DataMemory.io.Data:=EX_MEM.io.rs2_out
 	DataMemory.io.MemWrite:= EX_MEM.io.memWrite_out
 	DataMemory.io.MemRead:= EX_MEM.io.memRead_out
 
